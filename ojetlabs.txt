@@ -513,6 +513,90 @@ Step #3 Explore the router component and its importance
 Step #4 Bring up the SPA
 Step #5 Build the application for release
 
+Use the following reference code:
+----------------------------------------------------------------------------------------
+
+<div id="routing-container">
+
+
+            <!-- SELECTOR -->
+            <oj-tab-bar edge="top" data="[[dataProvider]]" selection="{{selection.path}}">
+              <template slot="itemTemplate" data-oj-as="item">
+                <oj-bind-if test="[[item.data.detail]]">
+                  <li :id="[[item.data.path]]">
+                    <a href="#">
+                      <oj-bind-text value="[[item.data.detail.label]]"></oj-bind-text>
+                    </a>
+                  </li>
+                </oj-bind-if>
+              </template>
+            </oj-tab-bar>
+
+            <hr/>
+
+            <!-- A simple feed back to see if the router changes state on new selections -->
+            <div id="pageContent" class="oj-panel oj-bg-info-30">
+              <h3><b>Router path:</b>
+              <oj-bind-text value="[[selection.path]]"></oj-bind-text>
+              </h3>
+              <h3><b>Path label:</b>
+              <oj-bind-if test="[[selection.state]]">
+                <oj-bind-text value="[[selection.state().detail.label]]"></oj-bind-text>
+              </oj-bind-if>
+              </h3>
+            </div>
+
+            <hr/>
+            
+            <!--
+            <div data-bind="ojModule: selection.path">
+            </div>
+            -->
+            <div>
+              <oj-module role="main" 
+                        class="oj-web-applayout-max-width oj-web-applayout-content" 
+                        config="[[moduleAdapter.koObservableConfig]]">
+              </oj-module>
+            </div>
+
+          </div>
+
+-------------------------------------------------------------------------------------------------
+
+
+// Define the routes
+
+    var routes = [
+        { path: "", redirect: "login" }, // Default route redirects to 'dashboard'
+        { path: "home", detail: { label: "Home" } },
+        { path: "products", detail: { label: "Products" } },
+        { path: "contacts", detail: { label: "Contacts" } },
+        { path: "login", detail: { label: "Login" } }
+
+    ];
+
+    // Create ADP with partial array, excluding first redirect route
+    this.dataProvider = new ArrayDataProvider(routes.slice(1), {
+          keyAttributes: "path"
+    });
+
+    // Create the router with the routes
+    var router = new CoreRouter(routes, {
+          urlAdapter: new UrlParamAdapter()
+    });
+
+    // Create an observable to react to the current router state path
+    //this.koRouterAdapter = new KnockoutRouterAdapter(router);
+    this.selection = new KnockoutRouterAdapter(router);
+
+    // Create the module adaptor
+    this.moduleAdapter = new ModuleRouterAdapter(router);
+
+    // Synchronize the router, causing it to go to its default route
+    router.sync();
+
+--------------------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------------------
 Lab #11 - Understanding the use of pub-sub  in OJET environments
 ----------------------------------------------------------------------------------------
